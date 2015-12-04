@@ -7,6 +7,24 @@ release that compile on Linux with the help of libbsd.
 
 [1] http://www.tedunangst.com/flak/post/signify
 
+Examples
+--------
+
+Create a new key pair:
+      $ signify -G -p newkey.pub -s newkey.sec
+
+Sign a file, specifying a signature name:
+      $ signify -S -s key.sec -m message.txt -x msg.sig
+
+Verify a signature, using the default signature name:
+      $ signify -V -p key.pub -m generalsorders.txt
+
+Verify a release directory containing SHA256.sig and a full set of release files:
+      $ signify -C -p /etc/signify/openbsd-58-base.pub -x SHA256.sig
+
+Verify a bsd.rd before an upgrade:
+      $ signify -C -p /etc/signify/openbsd-58-base.pub -x SHA256.sig bsd.rd
+
 To Install
 ----------
 
