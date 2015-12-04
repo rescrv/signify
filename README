@@ -1,0 +1,28 @@
+Signify
+=======
+
+This is a port of the OpenBSD signify[1] tool that compiles on Linux.  The
+sources are minimally modified versions of those that appear in the OpenBSD
+release that compile on Linux with the help of libbsd.
+
+[1] http://www.tedunangst.com/flak/post/signify
+
+To Install
+----------
+
+    apt-get install libbsd-dev
+    autoreconf -ivf # (only needed if compiling from git, not tarball)
+    ./configure
+    make
+    sudo make install
+
+To Update
+---------
+
+    mkdir openbsd
+    tar xzf /path/to/OpenBSD/src.tar.gz -C openbsd
+    OPENBSD_SOURCE=openbsd ./update.sh
+
+This will automatically pull in the source from the OpenBSD source tree and
+patch it as necessary.  The update script was built for 5.8 and may need
+changes in the future.
