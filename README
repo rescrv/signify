@@ -42,5 +42,5 @@ To Update
     OPENBSD_SOURCE=openbsd ./update.sh
 
 This will automatically pull in the source from the OpenBSD source tree and
-patch it as necessary.  The update script was built for 5.8 and may need
+patch it as necessary.  The update script was built for 6.0 and may need
 changes in the future.
