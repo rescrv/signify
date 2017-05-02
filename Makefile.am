@@ -18,6 +18,7 @@ noinst_HEADERS += ge25519.h
 noinst_HEADERS += ohash.h
 noinst_HEADERS += sc25519.h
 noinst_HEADERS += sha2.h
+noinst_HEADERS += signify.h
 
 EXTRA_DIST += ge25519_base.data
 EXTRA_DIST += helper.c
