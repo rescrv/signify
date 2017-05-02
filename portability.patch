@@ -30,10 +30,10 @@ index cde347c..405ea48 100644
  #define	MINIMUM(a,b) (((a) < (b)) ? (a) : (b))
  
 diff --git b/sha2.c a/sha2.c
-index 16486bc..6a01b87 100644
+index ec13e44..55e9f67 100644
 --- b/sha2.c
 +++ a/sha2.c
-@@ -299,9 +299,7 @@ SHA224Init(SHA2_CTX *context)
+@@ -311,9 +311,7 @@ SHA224Init(SHA2_CTX *context)
  }
  DEF_WEAK(SHA224Init);
  
@@ -44,7 +44,7 @@ index 16486bc..6a01b87 100644
  DEF_WEAK(SHA224Transform);
  DEF_WEAK(SHA224Update);
  DEF_WEAK(SHA224Pad);
-@@ -898,9 +896,7 @@ SHA384Init(SHA2_CTX *context)
+@@ -910,9 +908,7 @@ SHA384Init(SHA2_CTX *context)
  }
  DEF_WEAK(SHA384Init);
  
@@ -55,8 +55,20 @@ index 16486bc..6a01b87 100644
  DEF_WEAK(SHA384Transform);
  DEF_WEAK(SHA384Update);
  DEF_WEAK(SHA384Pad);
+@@ -947,9 +943,8 @@ SHA512_256Init(SHA2_CTX *context)
+ }
+ DEF_WEAK(SHA512_256Init);
+ 
+-MAKE_CLONE(SHA512_256Transform, SHA512Transform);
+-MAKE_CLONE(SHA512_256Update, SHA512Update);
+-MAKE_CLONE(SHA512_256Pad, SHA512Pad);
++void SHA512_256Update(SHA2_CTX *context, const u_int8_t *data, size_t len) __attribute__ ((weak, alias ("SHA512Update")));
++void SHA512_256Pad(SHA2_CTX *context) __attribute__ ((weak, alias ("SHA512Pad")));
+ DEF_WEAK(SHA512_256Transform);
+ DEF_WEAK(SHA512_256Update);
+ DEF_WEAK(SHA512_256Pad);
 diff --git b/signify.c a/signify.c
-index 9fe300c..4e47ef6 100644
+index 5158326..b15d2b8 100644
 --- b/signify.c
 +++ a/signify.c
 @@ -14,6 +14,9 @@
@@ -100,7 +112,7 @@ index 9fe300c..4e47ef6 100644
  #include <sha2.h>
  
  #include "crypto_api.h"
-@@ -70,7 +88,7 @@ struct sig {
+@@ -71,7 +89,7 @@ struct sig {
  	uint8_t sig[SIGBYTES];
  };
  
@@ -109,46 +121,89 @@ index 9fe300c..4e47ef6 100644
  usage(const char *error)
  {
  	if (error)
-@@ -660,8 +678,6 @@ main(int argc, char **argv)
+@@ -87,7 +105,7 @@ usage(const char *error)
+ 	exit(1);
+ }
+ 
+-int
++extern int
+ xopen(const char *fname, int oflags, mode_t mode)
+ {
+ 	struct stat sb;
+@@ -111,7 +129,7 @@ xopen(const char *fname, int oflags, mode_t mode)
+ 	return fd;
+ }
+ 
+-void *
++extern void *
+ xmalloc(size_t len)
+ {
+ 	void *p;
+@@ -206,7 +224,7 @@ readmsg(const char *filename, unsigned long long *msglenp)
+ 	return msg;
+ }
+ 
+-void
++extern void
+ writeall(int fd, const void *buf, size_t buflen, const char *filename)
+ {
+ 	ssize_t x;
+@@ -764,9 +782,6 @@ main(int argc, char **argv)
  		VERIFY
  	} verb = NONE;
  
 -	if (pledge("stdio rpath wpath cpath tty", NULL) == -1)
 -		err(1, "pledge");
- 
+-
  	rounds = 42;
  
-@@ -721,33 +737,6 @@ main(int argc, char **argv)
- 	argc -= optind;
- 	argv += optind;
+ 	while ((ch = getopt(argc, argv, "CGSVzc:em:np:qs:t:x:")) != -1) {
+@@ -839,8 +854,6 @@ main(int argc, char **argv)
  
--	if (setvbuf(stdout, NULL, _IOLBF, 0) != 0)
--		err(1, "setvbuf");
--
--	switch (verb) {
--	case GENERATE:
--	case SIGN:
--		/* keep it all */
--		break;
--	case CHECK:
+ #ifndef VERIFYONLY
+ 	if (verb == CHECK) {
 -		if (pledge("stdio rpath", NULL) == -1)
 -			err(1, "pledge");
--		break;
--	case VERIFY:
--		if (embedded && (!msgfile || strcmp(msgfile, "-") != 0)) {
+ 		if (!sigfile)
+ 			usage("must specify sigfile");
+ 		check(pubkeyfile, sigfile, quiet, argc, argv);
+@@ -865,14 +878,12 @@ main(int argc, char **argv)
+ 	switch (verb) {
+ #ifndef VERIFYONLY
+ 	case GENERATE:
+-		/* no pledge */
+ 		if (!pubkeyfile || !seckeyfile)
+ 			usage("must specify pubkey and seckey");
+ 		check_keyname_compliance(pubkeyfile, seckeyfile);
+ 		generate(pubkeyfile, seckeyfile, rounds, comment);
+ 		break;
+ 	case SIGN:
+-		/* no pledge */
+ 		if (gzip) {
+ 			if (!msgfile || !seckeyfile || !sigfile)
+ 				usage("must specify message sigfile seckey");
+@@ -885,15 +896,6 @@ main(int argc, char **argv)
+ 		break;
+ #endif
+ 	case VERIFY:
+-		if ((embedded || gzip) &&
+-		    (msgfile && strcmp(msgfile, "-") != 0)) {
+-			/* will need to create output file */
 -			if (pledge("stdio rpath wpath cpath", NULL) == -1)
 -				err(1, "pledge");
 -		} else {
 -			if (pledge("stdio rpath", NULL) == -1)
 -				err(1, "pledge");
 -		}
--		break;
--	default:
+ 		if (gzip) {
+ 			zverify(pubkeyfile, msgfile, sigfile, keytype);
+ 		} else {
+@@ -904,8 +906,6 @@ main(int argc, char **argv)
+ 		}
+ 		break;
+ 	default:
 -		if (pledge("stdio", NULL) == -1)
 -			err(1, "pledge");
--		break;
--	}
--
- #ifndef VERIFYONLY
- 	if (verb == CHECK) {
- 		if (!sigfile)
+ 		usage(NULL);
+ 		break;
+ 	}
