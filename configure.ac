@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.62])
-AC_INIT([signify-port], [6.0], [robert@rescrv.net])
+AC_INIT([signify-port], [6.1], [robert@rescrv.net])
 AM_INIT_AUTOMAKE(foreign dist-bzip2)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([signify.c])
