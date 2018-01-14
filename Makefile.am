@@ -39,7 +39,6 @@ signify_SOURCES += sha256hl.c
 signify_SOURCES += sha512hl.c
 signify_SOURCES += sha512_256hl.c
 signify_SOURCES += signify.c
-signify_SOURCES += smult_curve25519_ref.c
 signify_SOURCES += timingsafe_bcmp.c
 signify_SOURCES += zsig.c
 signify_LDADD = ${BSDLIB}

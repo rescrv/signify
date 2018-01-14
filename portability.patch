@@ -30,7 +30,7 @@ index cde347c..405ea48 100644
  #define	MINIMUM(a,b) (((a) < (b)) ? (a) : (b))
  
 diff --git b/sha2.c a/sha2.c
-index ec13e44..55e9f67 100644
+index 80fa50a..47462d2 100644
 --- b/sha2.c
 +++ a/sha2.c
 @@ -311,9 +311,7 @@ SHA224Init(SHA2_CTX *context)
@@ -68,7 +68,7 @@ index ec13e44..55e9f67 100644
  DEF_WEAK(SHA512_256Update);
  DEF_WEAK(SHA512_256Pad);
 diff --git b/signify.c a/signify.c
-index 5158326..b15d2b8 100644
+index b586896..c26a83a 100644
 --- b/signify.c
 +++ a/signify.c
 @@ -14,6 +14,9 @@
@@ -148,7 +148,17 @@ index 5158326..b15d2b8 100644
  writeall(int fd, const void *buf, size_t buflen, const char *filename)
  {
  	ssize_t x;
-@@ -764,9 +782,6 @@ main(int argc, char **argv)
+@@ -244,7 +262,8 @@ writekeyfile(const char *filename, const char *comment, const void *buf,
+ 	fd = xopen(filename, O_CREAT|oflags|O_NOFOLLOW|O_WRONLY, mode);
+ 	header = createheader(comment, buf, buflen);
+ 	writeall(fd, header, strlen(header), filename);
+-	freezero(header, strlen(header));
++	explicit_bzero(header, strlen(header));
++	free(header);
+ 	close(fd);
+ }
+ 
+@@ -763,9 +782,6 @@ main(int argc, char **argv)
  		VERIFY
  	} verb = NONE;
  
@@ -158,7 +168,7 @@ index 5158326..b15d2b8 100644
  	rounds = 42;
  
  	while ((ch = getopt(argc, argv, "CGSVzc:em:np:qs:t:x:")) != -1) {
-@@ -839,8 +854,6 @@ main(int argc, char **argv)
+@@ -838,8 +854,6 @@ main(int argc, char **argv)
  
  #ifndef VERIFYONLY
  	if (verb == CHECK) {
@@ -167,7 +177,7 @@ index 5158326..b15d2b8 100644
  		if (!sigfile)
  			usage("must specify sigfile");
  		check(pubkeyfile, sigfile, quiet, argc, argv);
-@@ -865,14 +878,12 @@ main(int argc, char **argv)
+@@ -864,14 +878,12 @@ main(int argc, char **argv)
  	switch (verb) {
  #ifndef VERIFYONLY
  	case GENERATE:
@@ -182,7 +192,7 @@ index 5158326..b15d2b8 100644
  		if (gzip) {
  			if (!msgfile || !seckeyfile || !sigfile)
  				usage("must specify message sigfile seckey");
-@@ -885,15 +896,6 @@ main(int argc, char **argv)
+@@ -884,15 +896,6 @@ main(int argc, char **argv)
  		break;
  #endif
  	case VERIFY:
@@ -198,7 +208,7 @@ index 5158326..b15d2b8 100644
  		if (gzip) {
  			zverify(pubkeyfile, msgfile, sigfile, keytype);
  		} else {
-@@ -904,8 +906,6 @@ main(int argc, char **argv)
+@@ -903,8 +906,6 @@ main(int argc, char **argv)
  		}
  		break;
  	default:

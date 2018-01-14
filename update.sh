@@ -18,7 +18,6 @@ cp ${OPENBSD_SOURCE}/usr.bin/signify/sc25519.h .
 cp ${OPENBSD_SOURCE}/usr.bin/signify/signify.1 .
 cp ${OPENBSD_SOURCE}/usr.bin/signify/signify.c .
 cp ${OPENBSD_SOURCE}/usr.bin/signify/signify.h .
-cp ${OPENBSD_SOURCE}/usr.bin/signify/smult_curve25519_ref.c .
 cp ${OPENBSD_SOURCE}/usr.bin/signify/zsig.c .
 
 cp ${OPENBSD_SOURCE}/include/blf.h .
