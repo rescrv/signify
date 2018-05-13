@@ -1,4 +1,4 @@
-/*	$OpenBSD: helper.c,v 1.16 2016/09/21 04:38:57 guenther Exp $ */
+/*	$OpenBSD: helper.c,v 1.17 2017/10/23 14:33:07 millert Exp $ */
 
 /*
  * Copyright (c) 2000 Poul-Henning Kamp <phk@FreeBSD.org>
@@ -54,7 +54,6 @@ SHA512_256End(SHA2_CTX *ctx, char *buf)
 	explicit_bzero(digest, sizeof(digest));
 	return (buf);
 }
-DEF_WEAK(SHA512_256End);
 
 char *
 SHA512_256FileChunk(const char *filename, char *buf, off_t off, off_t len)
@@ -71,13 +70,17 @@ SHA512_256FileChunk(const char *filename, char *buf, off_t off, off_t len)
 		return (NULL);
 	if (len == 0) {
 		if (fstat(fd, &sb) == -1) {
+			save_errno = errno;
 			close(fd);
+			errno = save_errno;
 			return (NULL);
 		}
 		len = sb.st_size;
 	}
 	if (off > 0 && lseek(fd, off, SEEK_SET) < 0) {
+		save_errno = errno;
 		close(fd);
+		errno = save_errno;
 		return (NULL);
 	}
 
@@ -92,14 +95,12 @@ SHA512_256FileChunk(const char *filename, char *buf, off_t off, off_t len)
 	errno = save_errno;
 	return (nr < 0 ? NULL : SHA512_256End(&ctx, buf));
 }
-DEF_WEAK(SHA512_256FileChunk);
 
 char *
 SHA512_256File(const char *filename, char *buf)
 {
 	return (SHA512_256FileChunk(filename, buf, 0, 0));
 }
-DEF_WEAK(SHA512_256File);
 
 char *
 SHA512_256Data(const u_char *data, size_t len, char *buf)
@@ -110,4 +111,3 @@ SHA512_256Data(const u_char *data, size_t len, char *buf)
 	SHA512_256Update(&ctx, data, len);
 	return (SHA512_256End(&ctx, buf));
 }
-DEF_WEAK(SHA512_256Data);
